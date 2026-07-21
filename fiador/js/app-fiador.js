@@ -1,29 +1,18 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, onValue, remove } from "firebase/database";
 
-// 🔥 NUEVA CONFIGURACIÓN DE FIREBASE (REEMPLAZA CON LA TUYA)
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
+// 🔥 CONFIGURACIÓN DE FIREBASE
 const firebaseConfig = {
-  apiKey: "AIzaSyCy_rJwB35LIqEYQuTPgh25tYmkqIfDczw",
-  authDomain: "sistema-entregas-dev.firebaseapp.com",
-  databaseURL: "https://sistema-entregas-dev-default-rtdb.firebaseio.com",
-  projectId: "sistema-entregas-dev",
-  storageBucket: "sistema-entregas-dev.firebasestorage.app",
-  messagingSenderId: "287519131424",
-  appId: "1:287519131424:web:a208ec25128d8036e13945"
+    apiKey: "AIzaSyCy_rJwB35LIqEYQuTPgh25tYmkqIfDczw",
+    authDomain: "sistema-entregas-dev.firebaseapp.com",
+    databaseURL: "https://sistema-entregas-dev-default-rtdb.firebaseio.com",
+    projectId: "sistema-entregas-dev",
+    storageBucket: "sistema-entregas-dev.firebasestorage.app",
+    messagingSenderId: "287519131424",
+    appId: "1:287519131424:web:a208ec25128d8036e13945"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
+// Inicializar Firebase UNA SOLA VEZ
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
