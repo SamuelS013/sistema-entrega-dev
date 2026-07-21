@@ -12,6 +12,12 @@
         <span class="badge-rol">Panel: Fiador (DEV)</span>
     </header>
     <main class="contenedor-principal">
+        <!-- Recuadro de Saldo Total Adeudado al Fiador -->
+        <section class="tarjeta-saldo-total">
+            <h2>Monto Total Adeudado al Fiador</h2>
+            <div id="monto-total-adeudado" class="monto-gran-total">$0.00</div>
+        </section>
+
         <section class="seccion-control">
             <button id="btn-generar-factura" class="btn-primario">Crear Entrega / Factura</button>
             <div id="overlay-factura" class="capa-oscura-fondo oculto">
@@ -51,13 +57,25 @@
         </section>
         <section class="seccion-listas">
             <div class="bloque-historial">
-                <h2>Historial de Facturas</h2>
+                <!-- 🟢 NUEVO: Título con icono de papelera -->
+                <div class="titulo-con-accion">
+                    <h2>Historial de Facturas</h2>
+                    <button id="btn-eliminar-facturas-pagadas" class="btn-eliminar-todo" title="Eliminar todas las facturas pagadas">
+                        🗑️
+                    </button>
+                </div>
                 <div id="contenedor-facturas" class="lista-scrollable">
                     <p class="alerta-vacio">No hay facturas registradas en el historial.</p>
                 </div>
             </div>
             <div class="bloque-pagos">
-                <h2>Pagos Recibidos</h2>
+                <!-- 🟢 NUEVO: Título con icono de papelera -->
+                <div class="titulo-con-accion">
+                    <h2>Pagos Recibidos</h2>
+                    <button id="btn-eliminar-pagos" class="btn-eliminar-todo" title="Eliminar todos los pagos">
+                        🗑️
+                    </button>
+                </div>
                 <div id="historial-pagos" class="lista-scrollable">
                     <p class="alerta-vacio">No se han recibido notificaciones de pago.</p>
                 </div>

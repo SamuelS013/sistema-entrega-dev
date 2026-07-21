@@ -5,6 +5,8 @@
     --gris-claro: #F5F5F5;
     --gris-borde: #E0E0E0;
     --fondo-oscuro-transparente: rgba(0, 0, 0, 0.5);
+    --rojo: #e63946;
+    --rojo-oscuro: #c62828;
 }
 
 * {
@@ -70,6 +72,40 @@ body {
     font-size: 42px;
     font-weight: bold;
     color: var(--naranja);
+}
+
+/* 🟢 NUEVO: Título con acción (icono de papelera) */
+.titulo-con-accion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.titulo-con-accion h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.btn-eliminar-todo {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    color: #999;
+}
+
+.btn-eliminar-todo:hover {
+    background-color: var(--rojo);
+    color: white;
+    transform: scale(1.1);
+}
+
+.btn-eliminar-todo:active {
+    transform: scale(0.95);
 }
 
 .btn-primario {
@@ -287,5 +323,14 @@ body {
 
     .acciones-formulario button {
         width: 100%;
+    }
+
+    .monto-gran-total {
+        font-size: 32px;
+    }
+
+    .titulo-con-accion {
+        flex-wrap: wrap;
+        gap: 10px;
     }
 }

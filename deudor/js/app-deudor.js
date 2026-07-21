@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, push, onValue } from "firebase/database";
+import { getDatabase, ref, set, push, onValue, remove } from "firebase/database";
 
 // 🔥 CONFIGURACIÓN DE FIREBASE
 const firebaseConfig = {
@@ -12,7 +12,6 @@ const firebaseConfig = {
     appId: "1:287519131424:web:a208ec25128d8036e13945"
 };
 
-// Inicializar Firebase UNA SOLA VEZ
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
@@ -24,8 +23,55 @@ const overlayPago = document.getElementById('overlay-pago');
 const btnRegistrarPago = document.getElementById('btn-registrar-pago');
 const btnCancelarPago = document.getElementById('btn-cancelar-pago');
 const formularioPago = document.getElementById('formulario-pago');
+const btnEliminarPagadas = document.getElementById('btn-eliminar-pagadas');
 
 let cacheFacturas = {};
+
+// 🟢 FUNCIÓN: Eliminar todas las facturas pagadas
+if (btnEliminarPagadas) {
+    btnEliminarPagadas.addEventListener('click', () => {
+        const facturasRef = ref(db, 'facturas');
+        
+        onValue(facturasRef, (snapshot) => {
+            if (!snapshot.exists()) {
+                alert('No hay facturas para eliminar.');
+                return;
+            }
+            
+            const datos = snapshot.val();
+            const idsPagadas = Object.keys(datos).filter(id => datos[id].estado === 'pagada');
+            
+            if (idsPagadas.length === 0) {
+                alert('No hay facturas pagadas para eliminar.');
+                return;
+            }
+            
+            const confirmacion = confirm(
+                `⚠️ ¿Estás seguro de que deseas eliminar TODAS tus facturas pagadas?\n\n` +
+                `Se eliminarán ${idsPagadas.length} factura(s) pagada(s).\n` +
+                `Las facturas pendientes NO serán afectadas.\n\n` +
+                `Esta acción no se puede deshacer.`
+            );
+            
+            if (!confirmacion) return;
+            
+            let eliminadas = 0;
+            idsPagadas.forEach(id => {
+                remove(ref(db, `facturas/${id}`))
+                    .then(() => {
+                        eliminadas++;
+                        if (eliminadas === idsPagadas.length) {
+                            alert(`✅ Se eliminaron ${eliminadas} factura(s) pagada(s) exitosamente.`);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error al eliminar factura:', error);
+                        alert('❌ Error al eliminar algunas facturas. Revisa la consola.');
+                    });
+            });
+        }, { onlyOnce: true });
+    });
+}
 
 // Lógica de apertura/cierre de modales
 if (btnRegistrarPago) {
@@ -59,7 +105,21 @@ if (montoGranTotal && contenedorPendientes && historialPagadas) {
         }
 
         cacheFacturas = snapshot.val();
-        Object.keys(cacheFacturas).forEach(id => {
+        const keys = Object.keys(cacheFacturas);
+        keys.sort((a, b) => {
+            const fechaA = cacheFacturas[a].fecha || '';
+            const fechaB = cacheFacturas[b].fecha || '';
+            if (fechaA && fechaB) {
+                const partesA = fechaA.split('/');
+                const partesB = fechaB.split('/');
+                const tsA = new Date(partesA[2], partesA[1] - 1, partesA[0]).getTime();
+                const tsB = new Date(partesB[2], partesB[1] - 1, partesB[0]).getTime();
+                return tsB - tsA;
+            }
+            return parseInt(b) - parseInt(a);
+        });
+
+        keys.forEach(id => {
             const factura = cacheFacturas[id];
             const div = document.createElement('div');
             div.className = 'tarjeta-factura';
@@ -124,7 +184,6 @@ if (formularioPago) {
         let facturaOriginal = cacheFacturas[inputIdFactura];
         let saldoOriginal = parseFloat(facturaOriginal.saldoRestante ?? facturaOriginal.monto);
 
-        // Aplicar a la factura seleccionada
         if (dineroDisponible >= saldoOriginal) {
             dineroDisponible -= saldoOriginal;
             facturaOriginal.saldoRestante = 0;
@@ -137,7 +196,6 @@ if (formularioPago) {
 
         set(ref(db, `facturas/${inputIdFactura}`), facturaOriginal);
 
-        // Efecto cascada
         if (dineroDisponible > 0) {
             const llavesFacturas = Object.keys(cacheFacturas).filter(id => id !== inputIdFactura);
             for (let id of llavesFacturas) {
@@ -159,7 +217,6 @@ if (formularioPago) {
             }
         }
 
-        // Registrar el pago
         const nuevoPago = {
             facturaId: inputIdFactura,
             monto: inputMontoPago,

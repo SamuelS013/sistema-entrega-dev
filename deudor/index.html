@@ -24,7 +24,13 @@
                 </div>
             </div>
             <div class="bloque-pagadas">
-                <h2>Historial de Facturas Pagadas</h2>
+                <!-- 🟢 NUEVO: Título con icono de papelera -->
+                <div class="titulo-con-accion">
+                    <h2>Historial de Facturas Pagadas</h2>
+                    <button id="btn-eliminar-pagadas" class="btn-eliminar-todo" title="Eliminar todas las facturas pagadas">
+                        🗑️
+                    </button>
+                </div>
                 <div id="historial-pagadas" class="lista-scrollable">
                     <p class="alerta-vacio">No hay registros de facturas pagadas aún.</p>
                 </div>
