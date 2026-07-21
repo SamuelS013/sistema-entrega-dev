@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Entregas Fiador - DEV</title>
+    <link rel="stylesheet" href="css/estilo-fiador.css">
+</head>
+<body>
+    <header class="header-sistema">
+        <h1>Sistema de Entregas Pachos</h1>
+        <span class="badge-rol">Panel: Fiador (DEV)</span>
+    </header>
+    <main class="contenedor-principal">
+        <section class="seccion-control">
+            <button id="btn-generar-factura" class="btn-primario">Crear Entrega / Factura</button>
+            <div id="overlay-factura" class="capa-oscura-fondo oculto">
+                <div id="contenedor-formulario" class="cuadro-formulario">
+                    <h3>Nueva Factura</h3>
+                    <form id="formulario-factura">
+                        <div class="meta-info-automatica">
+                            <p><strong>ID Factura:</strong> <span id="factura-id-automatico">----</span></p>
+                            <p><strong>Fecha:</strong> <span id="factura-fecha-automatica">----</span></p>
+                        </div>
+                        <div class="grupo-input">
+                            <label for="nombre-deudor">Nombre del Deudor:</label>
+                            <input type="text" id="nombre-deudor" required>
+                        </div>
+                        <div class="grupo-input">
+                            <label>Productos:</label>
+                            <div id="lista-productos-inputs">
+                                <div class="fila-producto">
+                                    <input type="text" placeholder="Producto" class="prod-nombre" required>
+                                    <input type="number" placeholder="Cant." class="prod-cantidad" min="1" value="1" required>
+                                    <input type="number" placeholder="Precio U." class="prod-precio" min="0" step="0.01" required>
+                                </div>
+                            </div>
+                            <button type="button" id="btn-agregar-producto" class="btn-secundario">+ Añadir otro producto</button>
+                        </div>
+                        <div class="monto-total-container">
+                            <span>Monto Total: </span>
+                            <span id="monto-total-automatico">0.00</span>
+                        </div>
+                        <div class="acciones-formulario">
+                            <button type="button" id="btn-cancelar" class="btn-cancelar">Cerrar Ventana</button>
+                            <button type="submit" class="btn-confirmar">Cerrar Factura</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <section class="seccion-listas">
+            <div class="bloque-historial">
+                <h2>Historial de Facturas</h2>
+                <div id="contenedor-facturas" class="lista-scrollable">
+                    <p class="alerta-vacio">No hay facturas registradas en el historial.</p>
+                </div>
+            </div>
+            <div class="bloque-pagos">
+                <h2>Pagos Recibidos</h2>
+                <div id="historial-pagos" class="lista-scrollable">
+                    <p class="alerta-vacio">No se han recibido notificaciones de pago.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+                "firebase/database": "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"
+            }
+        }
+    </script>
+    <script type="module" src="js/app-fiador.js"></script>
+</body>
+</html>

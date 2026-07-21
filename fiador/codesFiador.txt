@@ -1,0 +1,636 @@
+HTML:
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Entregas Fiador</title>
+    <link rel="stylesheet" href="css/estilo-fiador.css">
+</head>
+<body>
+    <header class="header-sistema">
+        <h1>Sistema de Entregas Pachos</h1>
+        <span class="badge-rol">Panel: Fiador</span>
+    </header>
+    
+    <main class="contenedor-principal">
+        <section class="seccion-control">
+            <button id="btn-generar-factura" class="btn-primario">Crear Entrega / Factura</button>
+            
+            <div id="overlay-factura" class="capa-oscura-fondo oculto">
+					  <div id="contenedor-formulario" class="cuadro-formulario">
+						<h3>Nueva Factura</h3>
+						<form id="formulario-factura">
+						  <div class="meta-info-automatica">
+							<p><strong>ID Factura:</strong> <span id="factura-id-automatico">----</span></p>
+							<p><strong>Fecha:</strong> <span id="factura-fecha-automatica">--/--/----</span></p>
+						  </div>
+						  <div class="grupo-input">
+							<label for="nombre-deudor">Nombre del Deudor: </label>
+							<input type="text" id="nombre-deudor" placeholder="Nombre del deudor" required>
+						  </div>
+						  <div class="grupo-input">
+							<label>Productos: </label>
+							<div id="lista-productos-inputs">
+							  <div class="fila-producto" style="display: flex; gap: 10px; margin-bottom: 10px;">
+								<input type="text" placeholder="Producto" class="prod-nombre" required style="flex: 2;">
+								<input type="number" placeholder="Cant." class="prod-cantidad" min="1" value="1" required style="flex: 0.5;">
+								<input type="number" placeholder="Precio U." class="prod-precio" min="0" step="0.01" required style="flex: 1;">
+							  </div>
+							</div>
+							<button type="button" id="btn-agregar-producto" style="margin-top: 10px; ">+ Añadir otro producto</button>
+						  </div>
+						  <div class="monto-total-container">
+							<span>Monto Total: $</span><span id="monto-total-automatico">0.00</span>
+						  </div>
+						  <div class="acciones-formulario">
+							<button type="button" id="btn-cancelar" class="btn-cancelar">Cerrar Ventana</button>
+							<button type="submit" class="btn-confirmar">Cerrar Factura</button>
+						  </div>
+						</form>
+					  </div>
+					</div>
+        </section>
+
+        <section class="seccion-listas">
+            <div class="bloque-historial">
+                <h2>Historial de Facturas</h2>
+                <div id="contenedor-facturas" class="lista-scrollable">
+                    <p class="alerta-vacio">No hay facturas registradas en el historial.</p>
+                </div>
+            </div>
+            <div class="bloque-pagos">
+                <h2>Pagos Recibidos</h2>
+                <div id="historial-pagos" class="lista-scrollable">
+                    <p class="alerta-vacio">No se han recibido notificaciones de pago.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+            "firebase/database": "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"
+        }
+    }
+    </script>
+    <script type="module" src="js/app-fiador.js"></script>
+</body>
+</html>
+
+CSS:
+/* Paleta base: Panadería Moderna */
+:root {
+  --naranja: #FF7A00;
+  --negro: #1A1A1A;
+  --blanco: #FFFFFF;
+  --gris-claro: #F5F5F5;
+  --gris-borde: #E0E0E0;
+  --fondo-oscuro-transparente: rgba(0, 0, 0, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--gris-claro);
+  color: var(--negro);
+  padding: 20px;
+}
+
+.header-sistema {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid var(--negro);
+  padding-bottom: 15px;
+  margin-bottom: 30px;
+}
+
+.header-sistema h1 {
+  font-size: 24px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.badge-rol {
+  background-color: var(--naranja);
+  color: var(--blanco);
+  padding: 5px 12px;
+  font-weight: bold;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.contenedor-principal {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Botones con esquinas redondeadas */
+.btn-primario, .btn-secundario, .btn-confirmar, .btn-cancelar {
+  background-color: var(--negro);
+  color: var(--blanco);
+  padding: 12px 24px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.btn-primario:hover, .btn-secundario:hover, .btn-confirmar:hover {
+  background-color: var(--naranja);
+}
+
+.btn-secundario {
+  padding: 8px 16px;
+  font-size: 13px;
+  background-color: #444;
+}
+
+.btn-cancelar {
+  background-color: #777;
+}
+.btn-cancelar:hover {
+  background-color: #555;
+}
+
+/* --- VENTANA MODAL FLOTANTE (CENTRADA Y GRANDE) --- */
+.capa-oscura-fondo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--fondo-oscuro-transparente);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Cuadro de generación de facturas centrado */
+.cuadro-formulario {
+  background-color: var(--blanco);
+  border: 2px solid var(--negro);
+  padding: 30px;
+  width: 90%;
+  max-width: 650px; /* Más grande para ver con más claridad */
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cuadro-formulario h3 {
+  font-size: 20px;
+  border-bottom: 2px solid var(--naranja);
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.meta-info-automatica {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--gris-claro);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.grupo-input {
+  margin-bottom: 20px;
+}
+
+.grupo-input label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.grupo-input input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--gris-borde);
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+/* --- BLOQUE COMPACTO DE FILA DE PRODUCTOS --- */
+.fila-producto {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.fila-producto .prod-nombre {
+  flex: 3; /* El nombre toma la mayor parte del espacio */
+}
+
+.fila-producto .prod-cantidad {
+  flex: 0.8; /* Mucho más pequeño */
+  text-align: center;
+}
+
+.fila-producto .prod-precio {
+  flex: 1; /* Proporcionalmente pequeño */
+  text-align: right;
+}
+
+.fila-producto input {
+  padding: 10px;
+  border: 1px solid var(--gris-borde);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.monto-total-container {
+  font-size: 22px;
+  font-weight: bold;
+  text-align: right;
+  margin: 20px 0;
+  border-top: 2px dashed var(--gris-borde);
+  padding-top: 15px;
+}
+
+.monto-total-container #monto-total-automatico {
+  color: var(--naranja);
+}
+
+.acciones-formulario {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.oculto {
+  display: none !important;
+}
+
+/* --- SECCIÓN HISTORIALES Y LISTAS --- */
+.seccion-listas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.lista-scrollable {
+  background-color: var(--blanco);
+  border: 2px solid var(--negro);
+  height: 400px;
+  overflow-y: auto;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+/* Recuadros pequeños para el historial de facturas */
+.tarjeta-factura {
+  border: 2px solid var(--negro);
+  padding: 15px;
+  margin-bottom: 12px;
+  background-color: var(--blanco);
+  border-radius: 8px;
+}
+
+.factura-cabecera {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.factura-monto {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.btn-anular-historial {
+  background-color: #e63946;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+.alerta-vacio {
+  color: #999;
+  text-align: center;
+  margin-top: 50px;
+  font-style: italic;
+}
+
+/* ==========================================
+   ADAPTACIÓN PARA CELULARES (TODO HACIA ABAJO)
+   ========================================== */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .header-sistema {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .header-sistema h1 {
+    font-size: 20px;
+  }
+
+  .btn-primario {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* El historial y los pagos recibidos pasan de 2 columnas a 1 sola */
+  .seccion-listas {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    margin-top: 25px;
+  }
+
+  /* Ventana modal flotante con scroll de pantalla completa */
+  .capa-oscura-fondo {
+    align-items: flex-start;
+    padding: 10px;
+    overflow-y: auto;
+  }
+
+  .cuadro-formulario {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    max-height: none;
+  }
+
+  /* ID y Fecha automáticos uno debajo de otro */
+  .meta-info-automatica {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  /* Las filas de los productos individuales se apilan hacia abajo */
+  .fila-producto {
+    flex-direction: column;
+    align-items: stretch;
+    background-color: var(--gris-claro);
+    padding: 10px;
+    border-radius: 6px;
+    gap: 8px;
+  }
+
+  .fila-producto input {
+    width: 100% !important;
+    text-align: left !important;
+  }
+
+  /* Los botones de cerrar y cancelar ventana se apilan */
+  .acciones-formulario {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .acciones-formulario button {
+    width: 100%;
+  }
+}
+
+JS:
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, onValue, remove } from "firebase/database";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDnCB670iJyud6HcdKnYpgqrTlkbG950BM",
+  authDomain: "sistema-entrega-pachos.firebaseapp.com",
+  databaseURL: "https://sistema-entrega-pachos-default-rtdb.firebaseio.com",
+  projectId: "sistema-entrega-pachos",
+  storageBucket: "sistema-entrega-pachos.firebasestorage.app",
+  messagingSenderId: "876518154698",
+  appId: "1:876518154698:web:58eb635b6f650704362f33"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Nodos del DOM
+const contenedorFacturas = document.getElementById('contenedor-facturas');
+const overlayFactura = document.getElementById('overlay-factura');
+const btnGenerarFactura = document.getElementById('btn-generar-factura');
+const btnCancelar = document.getElementById('btn-cancelar');
+const formularioFactura = document.getElementById('formulario-factura');
+const btnAgregarProducto = document.getElementById('btn-agregar-producto');
+const listaProductosInputs = document.getElementById('lista-productos-inputs');
+const lblMontoTotal = document.getElementById('monto-total-automatico');
+const lblIdFactura = document.getElementById('factura-id-automatico');
+const lblFechaFactura = document.getElementById('factura-fecha-automatica');
+
+let idFacturaActual = "";
+
+// Función para calcular el monto total sumando cada fila
+function calcularTotalFactura() {
+  let total = 0;
+  const filas = listaProductosInputs.querySelectorAll('.fila-producto');
+  filas.forEach(fila => {
+    const cantidad = parseFloat(fila.querySelector('.prod-cantidad').value) || 0;
+    const precio = parseFloat(fila.querySelector('.prod-precio').value) || 0;
+    total += cantidad * precio;
+  });
+  lblMontoTotal.textContent = total.toFixed(2);
+  return total;
+}
+
+// Escuchar cambios en los inputs de productos de manera dinámica
+listaProductosInputs.addEventListener('input', calcularTotalFactura);
+
+// Botón añadir producto dinámico corregido (El appendChild va ADENTRO)
+if (btnAgregarProducto) {
+  btnAgregarProducto.addEventListener('click', () => {
+    const nuevaFila = document.createElement('div');
+    nuevaFila.className = 'fila-producto';
+    nuevaFila.style.display = 'flex';
+    nuevaFila.style.gap = '10px';
+    nuevaFila.style.marginBottom = '10px';
+    nuevaFila.innerHTML = `
+      <input type="text" placeholder="Producto" class="prod-nombre" required style="flex: 2;">
+      <input type="number" placeholder="Cant." class="prod-cantidad" min="1" value="1" required style="flex: 0.5;">
+      <input type="number" placeholder="Precio U." class="prod-precio" min="0" step="0.01" required style="flex: 1;">
+    `;
+    listaProductosInputs.appendChild(nuevaFila);
+  });
+}
+
+// Abrir formulario y asignar ID de 4 dígitos y fecha
+if (btnGenerarFactura) {
+  btnGenerarFactura.addEventListener('click', () => {
+    idFacturaActual = Math.floor(1000 + Math.random() * 9000).toString();
+    const fechaHoy = new Date().toLocaleDateString();
+    
+    if (lblIdFactura) lblIdFactura.textContent = idFacturaActual;
+    if (lblFechaFactura) lblFechaFactura.textContent = fechaHoy;
+    lblMontoTotal.textContent = "0.00";
+    
+    if (overlayFactura) overlayFactura.classList.remove('oculto');
+  });
+}
+
+// Cancelar/Cerrar Ventana
+if (btnCancelar) {
+  btnCancelar.addEventListener('click', () => {
+    if (overlayFactura) overlayFactura.classList.add('oculto');
+    resetearFormulario();
+  });
+}
+
+function resetearFormulario() {
+  if (formularioFactura) formularioFactura.reset();
+  listaProductosInputs.innerHTML = `
+    <div class="fila-producto" style="display: flex; gap: 10px; margin-bottom: 10px;">
+      <input type="text" placeholder="Producto" class="prod-nombre" required style="flex: 2;">
+      <input type="number" placeholder="Cant." class="prod-cantidad" min="1" value="1" required style="flex: 0.5;">
+      <input type="number" placeholder="Precio U." class="prod-precio" min="0" step="0.01" required style="flex: 1;">
+    </div>
+  `;
+  lblMontoTotal.textContent = "0.00";
+}
+
+// Renderizar historial de facturas en tiempo real con botón de anulación incorporado
+if (contenedorFacturas) {
+  onValue(ref(db, 'facturas'), (snapshot) => {
+    contenedorFacturas.innerHTML = '';
+    if (!snapshot.exists()) {
+      contenedorFacturas.innerHTML = '<p class="alerta-vacio">No hay facturas registradas en el historial.</p>';
+      return;
+    }
+    
+    const datos = snapshot.val();
+    Object.keys(datos).forEach(id => {
+      const factura = datos[id];
+      const div = document.createElement('div');
+      div.className = 'tarjeta-factura';
+      
+      // Mostrar botón de anular solo si no está pagada completamente
+      const botonAnular = factura.estado !== 'pagada' 
+        ? `<button class="btn-anular-historial" data-id="${id}">Anular Factura</button>` 
+        : '';
+
+      div.innerHTML = `
+        <div class="factura-cabecera">
+          <span><strong>ID:</strong> ${factura.codigoCorto || id}</span>
+          <span>${factura.fecha}</span>
+        </div>
+        <div style="margin-bottom: 5px;"><strong>Deudor:</strong> ${factura.deudor}</div>
+        <div class="factura-monto">$${parseFloat(factura.monto).toFixed(2)}</div>
+        <div style="font-size: 12px; margin-top: 5px;"><strong>Estado:</strong> ${factura.estado.toUpperCase()} | <strong>Restante:</strong> $${parseFloat(factura.saldoRestante ?? factura.monto).toFixed(2)}</div>
+        ${botonAnular}
+      `;
+      contenedorFacturas.appendChild(div);
+    });
+
+    // Asignar eventos a los botones de anular agregados dinámicamente
+    document.querySelectorAll('.btn-anular-historial').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idAnular = e.target.getAttribute('data-id');
+        if (confirm(`¿Estás seguro de que deseas anular la factura #${idAnular}?`)) {
+          remove(ref(db, `facturas/${idAnular}`))
+            .then(() => alert('Factura anulada exitosamente.'))
+            .catch(() => alert('Error al anular la factura.'));
+        }
+      });
+    });
+  });
+}
+
+// Escuchar y listar los Pagos Recibidos en tiempo real (Vista limpia de transacciones de abono)
+const historialPagos = document.getElementById('historial-pagos');
+if (historialPagos) {
+  onValue(ref(db, 'pagos'), (snapshot) => {
+    historialPagos.innerHTML = '';
+    if (!snapshot.exists()) {
+      historialPagos.innerHTML = '<p class="alerta-vacio">No se han recibido notificaciones de pago.</p>';
+      return;
+    }
+    const pagos = snapshot.val();
+    Object.keys(pagos).forEach(key => {
+      const p = pagos[key];
+      const div = document.createElement('div');
+      div.className = 'tarjeta-factura';
+      div.style.borderLeft = "5px solid #FF7A00";
+      div.innerHTML = `
+        <div class="factura-cabecera">
+          <span><strong>Factura Ref:</strong> ${p.facturaId}</span>
+          <span>${p.fecha}</span>
+        </div>
+        <div><strong>Monto Abonado:</strong> $${parseFloat(p.monto).toFixed(2)}</div>
+        <div style="font-size:12px; color:#555;"><strong>Detalle:</strong> ${p.referencia} (${p.tipoPago})</div>
+      `;
+      historialPagos.appendChild(div);
+    });
+  });
+}
+
+// Guardar la factura estructurada con productos y saldo restante
+if (formularioFactura) {
+  formularioFactura.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const inputDeudor = document.getElementById('nombre-deudor');
+    const montoFinal = calcularTotalFactura();
+    
+    if (!inputDeudor || inputDeudor.value.trim() === "" || montoFinal <= 0) {
+      alert("Asegúrate de tener un deudor válido y productos con precio.");
+      return;
+    }
+
+    // Extraer array de productos ingresados
+    const productosArr = [];
+    listaProductosInputs.querySelectorAll('.fila-producto').forEach(fila => {
+      productosArr.push({
+        nombre: fila.querySelector('.prod-nombre').value.trim(),
+        cantidad: parseInt(fila.querySelector('.prod-cantidad').value) || 1,
+        precioUnitario: parseFloat(fila.querySelector('.prod-precio').value) || 0
+      });
+    });
+
+    const nuevaFactura = {
+      codigoCorto: idFacturaActual,
+      deudor: inputDeudor.value.trim(),
+      monto: montoFinal,
+      saldoRestante: montoFinal, // Inicia con el total
+      fecha: new Date().toLocaleDateString(),
+      estado: 'pendiente',
+      productos: productosArr
+    };
+
+    set(ref(db, `facturas/${idFacturaActual}`), nuevaFactura)
+      .then(() => {
+        if (overlayFactura) overlayFactura.classList.add('oculto');
+        alert(`Factura #${idFacturaActual} guardada exitosamente.`);
+        resetearFormulario();
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("Error al subir la factura.");
+      });
+  });
+}

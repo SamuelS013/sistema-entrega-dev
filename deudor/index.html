@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Cuentas Deudor - DEV</title>
+    <link rel="stylesheet" href="css/estilo-deudor.css">
+</head>
+<body>
+    <header class="header-sistema">
+        <h1>Sistema de Entregas Pachos</h1>
+        <span class="badge-rol">Panel: Deudor (DEV)</span>
+    </header>
+    <main class="contenedor-principal">
+        <section class="tarjeta-saldo-total">
+            <h2>Saldo Total Adeudado</h2>
+            <div id="monto-gran-total" class="monto-gran-total">$0.00</div>
+        </section>
+        <section class="seccion-listas">
+            <div class="bloque-pendientes">
+                <h2>Facturas Pendientes</h2>
+                <div id="contenedor-facturas-pendientes" class="lista-scrollable">
+                    <p class="alerta-vacio">¡Felicidades! No tienes facturas pendientes.</p>
+                </div>
+            </div>
+            <div class="bloque-pagadas">
+                <h2>Historial de Facturas Pagadas</h2>
+                <div id="historial-pagadas" class="lista-scrollable">
+                    <p class="alerta-vacio">No hay registros de facturas pagadas aún.</p>
+                </div>
+            </div>
+        </section>
+        <section class="seccion-pago-accion">
+            <button id="btn-registrar-pago" class="btn-primario">Registrar / Reportar un Pago</button>
+        </section>
+        <div id="overlay-pago" class="capa-oscura-fondo oculto">
+            <div class="cuadro-formulario">
+                <h3>Reportar Comprobante de Pago</h3>
+                <form id="formulario-pago">
+                    <div class="grupo-input">
+                        <label for="pago-id-factura">ID de la Factura a Pagar (4 dígitos):</label>
+                        <input type="text" id="pago-id-factura" placeholder="Ej. 4521" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="monto-pago">Monto a Pagar ($):</label>
+                        <input type="number" id="monto-pago" step="0.01" min="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="tipo-pago">Tipo de Pago:</label>
+                        <select id="tipo-pago" required>
+                            <option value="completo">Pago Completo</option>
+                            <option value="abono">Abono Parcial</option>
+                        </select>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="foto-comprobante">Foto / Screenshot del Pago:</label>
+                        <input type="file" id="foto-comprobante" accept="image/*" required>
+                    </div>
+                    <div class="grupo-input">
+                        <label for="referencia-pago">Referencia / Notas:</label>
+                        <input type="text" id="referencia-pago" placeholder="Ej. Transferencia Banesco" required>
+                    </div>
+                    <div class="acciones-formulario">
+                        <button type="button" id="btn-cancelar-pago" class="btn-cancelar">Cerrar Ventana</button>
+                        <button type="submit" class="btn-confirmar">Enviar Pago</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+                "firebase/database": "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"
+            }
+        }
+    </script>
+    <script type="module" src="js/app-deudor.js"></script>
+</body>
+</html>

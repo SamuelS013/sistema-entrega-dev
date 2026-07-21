@@ -1,0 +1,291 @@
+:root {
+    --naranja: #FF7A00;
+    --negro: #1A1A1A;
+    --blanco: #FFFFFF;
+    --gris-claro: #F5F5F5;
+    --gris-borde: #E0E0E0;
+    --fondo-oscuro-transparente: rgba(0, 0, 0, 0.5);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--gris-claro);
+    color: var(--negro);
+    padding: 20px;
+}
+
+.header-sistema {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--negro);
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.header-sistema h1 {
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.badge-rol {
+    background-color: var(--negro);
+    color: var(--blanco);
+    padding: 5px 12px;
+    font-weight: bold;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.contenedor-principal {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.tarjeta-saldo-total {
+    background-color: var(--blanco);
+    border: 2px solid var(--negro);
+    padding: 25px;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.tarjeta-saldo-total h2 {
+    font-size: 16px;
+    text-transform: uppercase;
+    color: #555;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.monto-gran-total {
+    font-size: 42px;
+    font-weight: bold;
+    color: var(--naranja);
+}
+
+.btn-primario {
+    background-color: var(--naranja);
+    color: var(--blanco);
+    padding: 12px 24px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    border-radius: 8px;
+    transition: background 0.2s;
+    font-size: 16px;
+}
+
+.btn-primario:hover {
+    background-color: var(--negro);
+}
+
+.btn-confirmar {
+    background-color: var(--naranja);
+    color: var(--blanco);
+    padding: 10px 20px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.btn-confirmar:hover {
+    background-color: var(--negro);
+}
+
+.btn-cancelar {
+    background-color: #777;
+    color: var(--blanco);
+    padding: 10px 20px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.btn-cancelar:hover {
+    background-color: #555;
+}
+
+.seccion-listas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.lista-scrollable {
+    background-color: var(--blanco);
+    border: 2px solid var(--negro);
+    height: 350px;
+    overflow-y: auto;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+.tarjeta-factura {
+    border: 2px solid var(--negro);
+    padding: 15px;
+    margin-bottom: 12px;
+    background-color: var(--blanco);
+    border-radius: 8px;
+}
+
+.factura-cabecera {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.factura-monto {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.alerta-vacio {
+    color: #999;
+    text-align: center;
+    margin-top: 50px;
+    font-style: italic;
+}
+
+.seccion-pago-accion {
+    margin-top: 30px;
+    text-align: center;
+}
+
+/* VENTANA MODAL */
+.capa-oscura-fondo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--fondo-oscuro-transparente);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.cuadro-formulario {
+    background-color: var(--blanco);
+    border: 2px solid var(--negro);
+    padding: 30px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cuadro-formulario h3 {
+    font-size: 20px;
+    border-bottom: 2px solid var(--naranja);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.grupo-input {
+    margin-bottom: 20px;
+}
+
+.grupo-input label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.grupo-input input[type="text"],
+.grupo-input input[type="number"],
+.grupo-input select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--gris-borde);
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.grupo-input input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--gris-borde);
+    border-radius: 6px;
+}
+
+.acciones-formulario {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.oculto {
+    display: none !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .header-sistema {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .header-sistema h1 {
+        font-size: 20px;
+    }
+
+    .seccion-listas {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .capa-oscura-fondo {
+        align-items: flex-start;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .cuadro-formulario {
+        width: 100%;
+        padding: 15px;
+        margin: 10px 0;
+        max-height: none;
+    }
+
+    .factura-cabecera {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .acciones-formulario {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .acciones-formulario button {
+        width: 100%;
+    }
+}
